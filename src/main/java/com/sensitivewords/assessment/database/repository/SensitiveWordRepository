@@ -1,0 +1,4 @@
+import org.springframework.data.JpaRepository;
+import com.sensitivewords.database.entity.SensitiveWord;
+
+public interface SenstiveWordRepository extends JpaRepository<SensitiveWord, Long> {}

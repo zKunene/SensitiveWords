@@ -1,0 +1,12 @@
+package com.sensitivewords.assessment.service;
+
+@Service
+public class SensitiveWordService {
+    private final SenstiveWordRepository repository;
+
+    public SensitiveWordService(SenstiveWordRepository repository) {
+        this.repository = repository;
+    }
+
+    
+}
