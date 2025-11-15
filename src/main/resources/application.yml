@@ -1,9 +1,11 @@
 spring:
-  datasource:
-    url:
-    username:
-    password:
-    driver-class-name:
+  datasource: 
+    url: jdbc:sqlserver://${DB_HOST:localhost}:1433;databaseName=${DB_NAME:SensitiveDb}
+    username:  ${DB_USER:sa}
+    password: ${DB_PASS:AV3ryStron9Pa55Word}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    schema: classpath:schema.sql
+    data: classpath:data.sql
 
   jpa:
     hibernate:
@@ -13,4 +15,9 @@ spring:
       hibernate:
         format-sql: true
 
-server: 8080
+server: 
+  port: 8080
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG

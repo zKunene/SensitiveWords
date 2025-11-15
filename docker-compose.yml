@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest 
+    container_name: sensitivewords-mssql
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSSQL_SA_PASSWORD: "AV3ryStron9Pa55Word"
+    volumes:
+      - ./mssql-data:/var/opt/mssql
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    containter_name: sensitivewords-api
+    depends_on:
+      -mssql
+    environment:
+      DB_HOST: mssql
+      DB_NAME: sensitive_db
+      DB_USER: sa
+      DB_PASS: AV3ryStron9Pa55Word
+    ports:
+      -"8080:8080"
+    restart: unless-stopped
