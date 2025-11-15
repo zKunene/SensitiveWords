@@ -1,10 +1,15 @@
 package com.sensitivewords.assessment.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Schema(description = "Request object containing the message to be filtered")
 public class MessageRequest {
+
     private String message;
 }

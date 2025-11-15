@@ -3,9 +3,28 @@ package com.sensitivewords.assessment.service;
 @Service
 public class SensitiveWordService {
     private final SenstiveWordRepository repository;
+    private List<Pattern> patterns;
 
     public SensitiveWordService(SenstiveWordRepository repository) {
         this.repository = repository;
+    }
+
+    @PostConstruct
+    public void init() {
+        List<SensitiveWord> words = repository.findAll();
+        patterns = words.stream()
+                    .map(SensitiveWord::getWord)
+                    .map(word -> Pattern.compile("(?i)\\b" + word + "\\b"))
+                    .collect(Collectors.toList());
+    }
+
+    public String filterMessage(String  message) {
+        String result = message;
+        for (Pattern p : patterns) {
+            result = p.matcher(result).replaceAll(match -> "*".repeat(match.group().length()));
+        }
+
+        return result;
     }
 
     
