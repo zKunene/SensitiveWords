@@ -17,14 +17,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    containter_name: sensitivewords-api
+    container_name: sensitivewords-api
     depends_on:
-      -mssql
+      - mssql
     environment:
       DB_HOST: mssql
       DB_NAME: sensitive_db
       DB_USER: sa
       DB_PASS: AV3ryStron9Pa55Word
     ports:
-      -"8080:8080"
+      - "8080:8080"
     restart: unless-stopped

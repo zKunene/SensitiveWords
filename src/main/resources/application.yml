@@ -1,6 +1,6 @@
 spring:
   datasource: 
-    url: jdbc:sqlserver://${DB_HOST:localhost}:1433;databaseName=${DB_NAME:SensitiveDb}
+    url: jdbc:sqlserver://${DB_HOST:localhost}:1433;databaseName=${DB_NAME:sensitewords}
     username:  ${DB_USER:sa}
     password: ${DB_PASS:AV3ryStron9Pa55Word}
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
