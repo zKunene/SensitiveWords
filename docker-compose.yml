@@ -6,6 +6,10 @@ services:
     container_name: sensitivewords-mssql
     ports:
       - "1433:1433"
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $${MSSQL_SA_PASSWORD} -Q 'SELECT 1'" ]
+      interval: 10s
+      retries: 10
     environment:
       ACCEPT_EULA: "Y"
       MSSSQL_SA_PASSWORD: "AV3ryStron9Pa55Word"
@@ -19,7 +23,8 @@ services:
       dockerfile: Dockerfile
     container_name: sensitivewords-api
     depends_on:
-      - mssql
+      mssql:
+        condition: service_healthy
     environment:
       DB_HOST: mssql
       DB_NAME: sensitive_db
