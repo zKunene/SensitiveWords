@@ -7,6 +7,7 @@ import com.sensitivewords.assessment.database.repository.SensitiveWordRepository
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 import java.util.regex.Pattern;
 import java.util.List;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 
-
+@Slf4j
 @Service
 public class SensitiveWordService {
     private final SensitiveWordRepository repository;
@@ -35,6 +36,7 @@ public class SensitiveWordService {
         //Load words from file
 
         List<String> fileWords = loadFromClasspathFile("sql_sensitive_list.txt");
+        log.info("loading words from file");
         for (String word : fileWords) {
             if (!sensitiveWords.contains(word)) {
                 sensitiveWords.add(word);
@@ -45,6 +47,7 @@ public class SensitiveWordService {
         List<String> dbWords = repository.findAll().stream()
                     .map(SensitiveWord::getWord)
                     .collect(Collectors.toList());
+        log.info("Readiing in words from DB");
         for (String word : dbWords) {
             if (!sensitiveWords.contains(word)) {
                 sensitiveWords.add(word);
@@ -62,7 +65,7 @@ public class SensitiveWordService {
         for (Pattern p : patterns) {
             result = p.matcher(result).replaceAll(match -> "*".repeat(match.group().length()));
         }
-
+        log.info("Message filtering successful");
         return result;
     }
 

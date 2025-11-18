@@ -1,19 +1,21 @@
 spring:
-  datasource: 
-    url: jdbc:sqlserver://${DB_HOST:localhost}:1433;databaseName=${DB_NAME:sensiteword_db}
-    username:  ${DB_USER:sa}
-    password: ${DB_PASS:AV3ryStron9Pa55Word}
+  datasource:
+    url: jdbc:sqlserver://SPAWN\MSSQLSERVER01:1433;databaseName=sensitiveword_db;encrypt=false;trustServerCertificate=true;
+    username: local
+    password: AV3ryStron9Pa55Word
+    #url: jdbc:sqlserver://${DB_HOST:localhost}:1433;databaseName=${DB_NAME:sensitiveword_db}
+    #username:  ${DB_USER:sa}
+    #password: ${DB_PASS:AV3ryStron9Pa55Word}
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     schema: classpath:schema.sql
     data: classpath:data.sql
 
   jpa:
+    database-platform: org.hibernate.dialect.SQLServerDialect
     hibernate:
       ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format-sql: true
+      show_sql: true
+      format_sql: true
 
 server: 
   port: 8080
