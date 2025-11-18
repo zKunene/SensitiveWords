@@ -40,15 +40,15 @@ public class SensitiveWordController {
     }
 
 
+     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Word added successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request",content = @Content(schema = @Schema(hidden = true)))
+    })
     @PostMapping("/add")
-    public ResponseEntity<SensitiveWord> addWord(@RequestBody SensitiveWord word) {
-        if (word.getId() == null) {
-            throw new IllegalArgumentException("Word cannot be null");
-        }
+    public ResponseEntity<URI> addWord(@RequestBody SensitiveWord word) {
         SensitiveWord saved = repository.save(word);
-
         URI location = URI.create("api/v1/sensitivewords" + Objects.requireNonNull(saved.getId(), "Saved entity id cannot be null"));
-        return ResponseEntity.created(Objects.requireNonNull(location, "URI is null")).body(saved);
+        return ResponseEntity.ok(location);//created(Objects.requireNonNull(location, "URI is null")).body(saved);
     }
 
     @Operation(summary = "Delete a sensitive word by ID")
@@ -59,9 +59,7 @@ public class SensitiveWordController {
     })
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteWord(@PathVariable Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID cannot be null");
-        }
+    
         repository.deleteById(id);
         return ResponseEntity.noContent().build();
     }

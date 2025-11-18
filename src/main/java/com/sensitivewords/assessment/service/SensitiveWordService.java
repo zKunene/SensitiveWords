@@ -33,6 +33,18 @@ public class SensitiveWordService {
 
     @PostConstruct
     public void init() {
+
+        //Load from DB
+        List<String> dbWords = repository.findAll().stream()
+                    .map(SensitiveWord::getWord)
+                    .collect(Collectors.toList());
+        log.info("Reading in words from DB");
+        for (String word : dbWords) {
+            if (!sensitiveWords.contains(word)) {
+                sensitiveWords.add(word.toUpperCase());
+
+            }
+        }
         //Load words from file
 
         List<String> fileWords = loadFromClasspathFile("sql_sensitive_list.txt");
@@ -40,17 +52,9 @@ public class SensitiveWordService {
         for (String word : fileWords) {
             if (!sensitiveWords.contains(word)) {
                 sensitiveWords.add(word);
-            }
-        }
-
-        //Load from DB
-        List<String> dbWords = repository.findAll().stream()
-                    .map(SensitiveWord::getWord)
-                    .collect(Collectors.toList());
-        log.info("Readiing in words from DB");
-        for (String word : dbWords) {
-            if (!sensitiveWords.contains(word)) {
-                sensitiveWords.add(word);
+                if (repository.findByWordIgnoreCase(word.toUpperCase()).isEmpty()) {
+                    repository.save(SensitiveWord.builder().word(word).build());
+                }
             }
         }
 
@@ -70,24 +74,32 @@ public class SensitiveWordService {
     }
 
     private List<String> loadFromClasspathFile(String resourceName) {
-        try {
-            ClassPathResource resource = new ClassPathResource(Objects.requireNonNull(resourceName, "Resource cannot be null"));
-            if (!resource.exists()) {
-                return List.of();
+        List<String> words = new ArrayList<>();
+        ClassPathResource resource = new ClassPathResource(Objects.requireNonNull(resourceName, "Resource cannot be null"));
+    
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
+            String line;
+            while ((line=reader.readLine()) != null) {
+                line = line.trim();
+
+                if (line.startsWith("["))
+                    line = line.substring(1);
+
+                if (line.endsWith("]"))
+                    line = line.substring(0, line.length()-1);
+                
+                if (line.startsWith(","))
+                    line = line.substring(1).trim();
+
+                if (line.startsWith("\"") && line.endsWith("\""))
+                    line = line.substring(1, line.length() -1);
+
+                if (line.length() !=0) {
+                    words.add(line);
+                }
+                
             }
-            try (InputStream is = resource.getInputStream();
-                BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                    
-                String content = br.lines().collect(Collectors.joining());
-                content = content.replace("[","").replace("]","").trim();
-                if (content.isEmpty()) {
-                    return List.of();
-                }
-
-                String[] parts = content.split(",");
-                return Pattern.compile("\\r?\\n").splitAsStream(String.join(",",parts)).map(s -> s.replace("\"", "").trim()).filter(s -> !s.isEmpty()).collect(Collectors.toList());
-
-                }
+          return words;      
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to load resource: " + resourceName, e);
