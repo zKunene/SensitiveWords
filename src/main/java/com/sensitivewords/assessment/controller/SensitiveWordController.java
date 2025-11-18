@@ -3,6 +3,7 @@ package com.sensitivewords.assessment.controller;
 import com.sensitivewords.assessment.dto.MessageRequest;
 import com.sensitivewords.assessment.dto.MessageResponse;
 import com.sensitivewords.assessment.service.SensitiveWordService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import com.sensitivewords.assessment.database.repository.SensitiveWordRepository;
 import com.sensitivewords.assessment.database.entity.SensitiveWord;
@@ -14,8 +15,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
-import java.net.URI;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/sensitivewords")
@@ -45,10 +44,11 @@ public class SensitiveWordController {
             @ApiResponse(responseCode = "400", description = "Invalid request",content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping("/add")
-    public ResponseEntity<URI> addWord(@RequestBody SensitiveWord word) {
-        SensitiveWord saved = repository.save(word);
-        URI location = URI.create("api/v1/sensitivewords" + Objects.requireNonNull(saved.getId(), "Saved entity id cannot be null"));
-        return ResponseEntity.ok(location);//created(Objects.requireNonNull(location, "URI is null")).body(saved);
+    public ResponseEntity<String> addWord(@RequestBody String word) {
+        if (service.addSensitiveWord(word)) {
+            return ResponseEntity.ok("Word successfully added");
+        }
+        return ResponseEntity.ok("Word already created in DB");
     }
 
     @Operation(summary = "Delete a sensitive word by ID")
@@ -58,10 +58,12 @@ public class SensitiveWordController {
                     content = @Content(schema = @Schema(hidden = true)))
     })
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteWord(@PathVariable Long id) {
+    public ResponseEntity<?> deleteWord(@PathVariable Long id) {
     
-        repository.deleteById(id);
-        return ResponseEntity.noContent().build();
+        if (service.removeSensitiveWord(id) ==true) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Word not found");
     }
 
     @Operation(summary = "Get all sensitive words")
@@ -72,5 +74,22 @@ public class SensitiveWordController {
     public ResponseEntity<List<SensitiveWord>> list() {
         List<SensitiveWord> list = repository.findAll();
         return ResponseEntity.ok(list);
+    }
+
+    @Operation(summary = "Get sensitive word by id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Word returned"),
+            @ApiResponse(responseCode = "404", description = "Word not found")
+    })
+    @GetMapping("findWord/{id}")
+    public ResponseEntity<?> findWord(@PathVariable Long id) {
+        final ResponseEntity<?>[] response = new ResponseEntity[1];
+        repository.findById(id).ifPresentOrElse(word -> 
+            {
+                response[0] = ResponseEntity.ok(word);
+            }, () -> {
+                response[0] = ResponseEntity.status(HttpStatus.NOT_FOUND).body("Word not found");
+            });
+       return response[0];
     }
 }

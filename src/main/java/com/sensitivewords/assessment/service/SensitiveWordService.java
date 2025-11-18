@@ -35,25 +35,15 @@ public class SensitiveWordService {
     public void init() {
 
         //Load from DB
-        List<String> dbWords = repository.findAll().stream()
-                    .map(SensitiveWord::getWord)
-                    .collect(Collectors.toList());
-        log.info("Reading in words from DB");
-        for (String word : dbWords) {
-            if (!sensitiveWords.contains(word)) {
-                sensitiveWords.add(word.toUpperCase());
-
-            }
-        }
+        
         //Load words from file
-
         List<String> fileWords = loadFromClasspathFile("sql_sensitive_list.txt");
         log.info("loading words from file");
         for (String word : fileWords) {
             if (!sensitiveWords.contains(word)) {
                 sensitiveWords.add(word);
-                if (repository.findByWordIgnoreCase(word.toUpperCase()).isEmpty()) {
-                    repository.save(SensitiveWord.builder().word(word).build());
+                if (repository.findByWord(word.toUpperCase()).isEmpty()) {
+                    repository.save(Objects.requireNonNull(SensitiveWord.builder().word(word).build()));
                 }
             }
         }
@@ -73,7 +63,7 @@ public class SensitiveWordService {
         return result;
     }
 
-    private List<String> loadFromClasspathFile(String resourceName) {
+    private List<String> loadFromClasspathFile(final String resourceName) {
         List<String> words = new ArrayList<>();
         ClassPathResource resource = new ClassPathResource(Objects.requireNonNull(resourceName, "Resource cannot be null"));
     
@@ -103,6 +93,43 @@ public class SensitiveWordService {
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to load resource: " + resourceName, e);
+        }
+    }
+
+    public boolean addSensitiveWord(final String word) {
+        if (word.length() > 0 && repository.findByWord(word.toUpperCase()).isEmpty()) {
+            repository.save(SensitiveWord.builder().word(word).build());
+            refresh();
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
+    public boolean removeSensitiveWord(final Long id) {
+        boolean exists = repository.existsById(id);
+        if (!exists) {
+            return false;
+        }
+        repository.deleteById(id);
+        refresh();
+        return true;
+    }
+
+    public void refresh() {
+        //Load from DB
+        sensitiveWords.clear();
+        List<String> dbWords = repository.findAll().stream()
+                    .map(SensitiveWord::getWord)
+                    .collect(Collectors.toList());
+        log.info("Reading in words from DB");
+        for (String word : dbWords) {
+            if (!sensitiveWords.contains(word)) {
+                sensitiveWords.add(word.toUpperCase());
+
+            }
         }
     }
     

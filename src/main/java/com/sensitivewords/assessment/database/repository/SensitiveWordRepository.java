@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface SensitiveWordRepository extends JpaRepository<SensitiveWord, Long> {
-    @Query("SELECT * FROM sensitiveword_db WHERE word =:word")
-    Optional<SensitiveWord> findByWordIgnoreCase(@Param("word") String word);
+    //@Query("SELECT * FROM dbo.sensitiveword_db WHERE word =:word")
+    Optional<SensitiveWord> findByWord(String word);
 }
