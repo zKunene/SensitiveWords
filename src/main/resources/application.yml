@@ -1,10 +1,12 @@
 spring:
+  profile:
+    active: local
   datasource:
-    url: jdbc:sqlserver://SPAWN\MSSQLSERVER01:1433;databaseName=sensitiveword_db;schema=dbo;encrypt=false;trustServerCertificate=true;
+    url: jdbc:sqlserver://localhost\MSSQLSERVER01:1433;databaseName=sensitiveword_db;schema=dbo;encrypt=false;trustServerCertificate=true;
     username: local
     password: AV3ryStron9Pa55Word
     #url: jdbc:sqlserver://${DB_HOST:localhost}:1433;databaseName=${DB_NAME:sensitiveword_db}
-    #username:  ${DB_USER:sa}
+    #username:  ${DB_USER:local}
     #password: ${DB_PASS:AV3ryStron9Pa55Word}
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     schema: classpath:schema.sql

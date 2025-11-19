@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:sqlserver://localhost\MSSQLSERVER01:1433;databaseName=sensitiveword_db;schema=dbo;encrypt=false;trustServerCertificate=true;
+    username: sa
+    password: AV3ryStron9Pa55Word
+
+  jpa:
+  hibernate:
+    ddl-auto: update
+  properties:
+    hibernate.default_schema: dbo
+    hibernate.dialect: org.hibernate.dialect.SQLServerDialect

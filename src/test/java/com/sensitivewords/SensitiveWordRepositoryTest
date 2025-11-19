@@ -1,0 +1,30 @@
+
+
+@Testcontainers
+@SpringBootTest
+public class SensitiveWordRepositoryTest {
+
+    @Container
+    private static final MSSQLServerContainer<?> mssql = 
+            new MSSQLContainer<>("mcr.microsoft.com/mssql/server:2022-latest")
+            .acceptLicense();
+
+    @DynamicPropertySource
+    static void configure(DynamicPropertySource registry) {
+        registry.add("spring.datasource.url", mssql::getJdbcUrl);
+        registry.add("spring.datasource.username", mssql::getUsername);
+        registry.add("spring.datasource.password", mssql::getPassword);
+    }
+
+    @Autowired
+    private SensitiveWordRepoistory repository;
+
+    @Test
+    void shouldSaveWord() {
+        SensitiveWord word = new SensitiveWord(null, "fraud");
+
+        repository.save(word);
+
+        assertTrue(repository.findByWord("fraud").isPresent());
+    }
+}

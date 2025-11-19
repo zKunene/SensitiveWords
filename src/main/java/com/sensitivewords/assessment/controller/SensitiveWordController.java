@@ -39,9 +39,10 @@ public class SensitiveWordController {
     }
 
 
-     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Word added successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request",content = @Content(schema = @Schema(hidden = true)))
+    @Operation(summary = "Add a new word with a string")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Word added successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request",content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping("/add")
     public ResponseEntity<String> addWord(@RequestBody String word) {

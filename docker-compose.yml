@@ -13,8 +13,7 @@ services:
     environment:
       ACCEPT_EULA: "Y"
       MSSSQL_SA_PASSWORD: "AV3ryStron9Pa55Word"
-    volumes:
-      - ./mssql-data:/var/opt/mssql
+
     restart: unless-stopped
 
   app:
@@ -28,7 +27,7 @@ services:
     environment:
       DB_HOST: mssql
       DB_NAME: sensitive_db
-      DB_USER: sa
+      DB_USER: local
       DB_PASS: AV3ryStron9Pa55Word
     ports:
       - "8080:8080"
